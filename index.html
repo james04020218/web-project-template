@@ -3,12 +3,478 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>KT 결합 할인 계산기</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    
-    
+    </head>
+<body class="text-slate-800">
+    <header class="bg-sky-700 text-white p-6 shadow-md">
+        <div class="container mx-auto max-w-4xl">
+            <h1 class="text-3xl font-bold text-center">KT 결합 할인 계산기</h1>
+            <p class="text-center text-sky-200 mt-1">선택하신 서비스와 할인 유형에 따른 예상 요금을 계산해 보세요.</p>
+        </div>
+    </header>
+
+    <main class="container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8">
+        <section id="inputSection" class="mb-8">
+            <h2 class="section-title">1. 서비스 선택 (3년 약정 기준, VAT 포함)</h2>
+            <p class="mb-3 text-sm text-slate-600">아래 항목들을 선택하거나 입력해주세요. 모든 요금은 KT 표준 3년 약정, 부가세 포함 금액을 기준으로 합니다. TV, 전화, 모바일 선택은 인터넷 요금 할인 계산에 영향을 미칩니다.</p>
+            
+            <div class="mb-2 text-sm">
+                <p class="font-semibold text-red-600">⚠️ 민감정보</p>
+                <p><a href="https://miso.kr/booking/forms/secure-details?querystring=고객님 전화번호" target="_blank" class="text-red-500 hover:text-red-700 underline font-medium break-all">https://miso.kr/booking/forms/secure-details?querystring=고객님 전화번호</a></p>
+                <p class="text-slate-600">ㄴ> 위 링크를 고객에게 문자로 전송해주세요. (아래 스크립트 복사 기능 이용)</p>
+            </div>
+            <div class="mb-2 text-sm">
+                <span class="font-semibold text-sky-700">참고 스프레드시트:</span>
+                <a href="https://docs.google.com/spreadsheets/d/10d21RrhIPBiJr7RZIHnk0h1dB4GvTEcHCuXSyFYw1M4/edit?gid=0#gid=0" target="_blank" class="text-blue-600 hover:text-blue-700 underline font-medium">바로가기</a>
+            </div>
+            <div class="mb-4 text-sm">
+                <span class="font-semibold text-sky-700">KT 인터넷 상품청약 본인인증 링크:</span>
+                <a href="https://online.kt.com/smart/simple/simpleCustomerInfoPop.do?prdcId=0F0BA335-ACD6-459E-BDB3-95CE61EEFE35" target="_blank" class="text-blue-600 hover:text-blue-700 underline font-medium">바로가기 (PASS 또는 신용카드 인증)</a>
+            </div>
+
+            <div class="input-group">
+                <label class="input-label">인터넷 유형 선택</label>
+                <div class="flex items-center space-x-4">
+                    <label class="radio-label">
+                        <input type="radio" name="internetType" value="bundle" class="radio-input" checked>
+                        인터넷 + TV 번들
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="internetType" value="standalone" class="radio-input">
+                        인터넷 단독
+                    </label>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="input-group">
+                    <label for="internetPlan" class="input-label">인터넷 요금제</label>
+                    <select id="internetPlan" class="select-field">
+                        </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="wifiRouterRental" class="input-label block mb-1">와이파이 공유기</label>
+                     <select id="wifiRouterRental" class="select-field">
+                          <option value="1100" data-name="KT공유기">KT공유기 (월 1,100원)</option>
+                          <option value="0" data-name="KT공유기 무료 (인단독 1GB)">KT공유기 무료 (인단독 1GB 시)</option>
+                          <option value="0" data-name="KT공유기 X">KT공유기 X (미사용)</option>
+                     </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="tvPlan" class="input-label">TV 요금제 (1번째 TV, 기가지니A 포함가)</label>
+                    <select id="tvPlan" class="select-field">
+                        <option value="none" data-category="없음" data-stb-included-price="0">선택 안함</option>
+                        <option value="KTTV베이직" data-price="15400" data-category="베이직" data-stb-included-price="15400">KTTV베이직 (236채널) + 기가지니A (월 15,400원)</option>
+                        <option value="KTTV라이트" data-price="16500" data-category="라이트" data-stb-included-price="16500">KTTV라이트 (240채널) + 기가지니A (월 16,500원)</option>
+                        <option value="KTTV에센스" data-price="19800" data-category="에센스" data-stb-included-price="19800">KTTV에센스 (266채널) + 기가지니A (월 19,800원)</option>
+                        <option value="KTTV에센스 플러스" data-price="24200" data-category="에센스 플러스" data-stb-included-price="24200">KTTV에센스 플러스 (266+채널) (월 24,200원)</option>
+                        <option value="KTTV넷플릭스 HD" data-price="31100" data-category="넷플릭스 HD" data-stb-included-price="31100">KTTV넷플릭스 HD (267채널) (월 31,100원)</option>
+                        <option value="KTTV넷플릭스 UHD" data-price="34600" data-category="넷플릭스 UHD" data-stb-included-price="34600">KTTV넷플릭스 UHD (267채널) (월 34,600원)</option>
+                        <option value="KTTV키즈랜드팩초이스" data-price="20900" data-category="키즈랜드" data-stb-included-price="20900">KTTV키즈랜드팩초이스 (월 20,900원)</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="additionalTvPlan" class="input-label">추가 TV 선택 (2번째 TV)</label>
+                    <select id="additionalTvPlan" class="select-field">
+                        <option value="none" data-price="0" data-name="선택 안함">선택 안함</option>
+                        <option value="KTTV 추가베이직" data-price="10670" data-name="베이직 (236채널) + 기가지니A">KTTV 추가베이직 (236채널) + 기가지니A (월 10,670원)</option>
+                        <option value="KTTV 추가라이트" data-price="11220" data-name="라이트 (240채널) + 기가지니A">KTTV 추가라이트 (240채널) + 기가지니A (월 11,220원)</option>
+                        <option value="KTTV 추가에센스" data-price="13420" data-name="에센스 (266채널) + 기가지니A">KTTV 추가에센스 (266채널) + 기가지니A (월 13,420원)</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="phonePlan" class="input-label">집전화 요금제</label>
+                    <select id="phonePlan" class="select-field">
+                        <option value="none">선택 안함</option>
+                        <option value="KT일반 전화일반 전화" data-price="6050">KT일반 전화일반 전화 (월 6,050원)</option>
+                        <option value="KT일반 전화인터넷 전화 (모임스톤)" data-price="5940">KT일반 전화인터넷 전화 (모임스톤) (월 5,940원)</option>
+                        <option value="KT일반 전화인터넷 (단독) 500mb 이상 + 인터넷 전화" data-price="3850">KT일반 전화인터넷 (단독) 500mb 이상 + 인터넷 전화 (월 3,850원, 패밀리 중복불가)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label class="input-label">KT 부가서비스 (선택)</label>
+                <div id="addonServicesContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <label class="flex items-center"><input type="checkbox" name="addonService" value="기가지니3A" data-price="1100" class="radio-input mr-2">기가지니3A (AI 셋톱박스) (월 1,100원)</label>
+                    <label class="flex items-center"><input type="checkbox" name="addonService" value="AI 지니 TV 올인원 사운드바" data-price="5500" class="radio-input mr-2">AI 지니 TV 올인원 사운드바 (월 5,500원)</label>
+                    <label class="flex items-center"><input type="checkbox" name="addonService" value="버디증폭기" data-price="1650" class="radio-input mr-2">버디증폭기 (월 1,650원)</label>
+                    <label class="flex items-center"><input type="checkbox" name="addonService" value="기가지니 4A" data-price="3300" class="radio-input mr-2">기가지니 4A (월 3,300원)</label>
+                </div>
+            </div>
+
+        </section>
+
+        <section id="discountTypeSection" class="mb-8">
+            <h2 class="section-title">2. 결합 할인 유형 선택</h2>
+            <div class="bg-white p-6 rounded-lg shadow">
+                <p class="mb-4 text-sm text-slate-600">가장 유리한 할인 유형을 선택하거나, 각 유형별 예상 요금을 비교해보세요.</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
+                     <label class="radio-label"><input type="radio" name="discountType" value="none" class="radio-input"> 결합 할인 없음</label>
+                    <div class="flex items-center">
+                        <label class="radio-label"><input type="radio" name="discountType" value="totalAmountBundle" class="radio-input" checked> 총액 결합할인</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="totalAmountDetailsToggle">
+                            <span class="slider"></span>
+                        </label>
+                        <span class="ml-1 text-xs text-slate-500">(상세보기)</span>
+                    </div>
+                    <div class="flex items-center">
+                        <label class="radio-label"><input type="radio" name="discountType" value="premiumFamilyBundle" class="radio-input"> 프리미엄 가족결합</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="premiumFamilyDetailsToggle">
+                            <span class="slider"></span>
+                        </label>
+                        <span class="ml-1 text-xs text-slate-500">(상세보기)</span>
+                    </div>
+                    <div class="flex items-center">
+                        <label class="radio-label"><input type="radio" name="discountType" value="premiumSingleBundle" class="radio-input"> 프리미엄 싱글결합</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="premiumSingleDetailsToggle">
+                            <span class="slider"></span>
+                        </label>
+                        <span class="ml-1 text-xs text-slate-500">(상세보기)</span>
+                    </div>
+                    <div class="flex items-center">
+                        <label class="radio-label"><input type="radio" name="discountType" value="mvnoBundle" class="radio-input"> 알뜰폰 결합</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="mvnoDetailsToggle">
+                            <span class="slider"></span>
+                        </label>
+                        <span class="ml-1 text-xs text-slate-500">(상세보기)</span>
+                    </div>
+                    <div class="flex items-center">
+                        <label class="radio-label"><input type="radio" name="discountType" value="familyBundle" class="radio-input"> 패밀리 결합 (인터넷 추가회선)</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="familyBundleDetailsToggle">
+                            <span class="slider"></span>
+                        </label>
+                        <span class="ml-1 text-xs text-slate-500">(상세보기)</span>
+                    </div>
+                     <div class="flex items-center">
+                        <label class="radio-label"><input type="radio" name="discountType" value="separateFamilyBundle" class="radio-input"> 따로 살아도 가족결합</label>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="separateFamilyDetailsToggle">
+                            <span class="slider"></span>
+                        </label>
+                        <span class="ml-1 text-xs text-slate-500">(상세보기)</span>
+                    </div>
+                </div>
+
+                <div class="input-group mt-6">
+                    <label class="input-label">모바일 회선 정보 (최대 5회선)</label>
+                    <div class="flex items-center mb-2">
+                        <label for="mobileLinesCount" class="mr-2 text-sm text-slate-700">결합할 모바일 회선 수:</label>
+                        <input type="number" id="mobileLinesCount" min="0" max="5" value="0" class="input-field w-20 text-center">
+                    </div>
+                    <div id="mobileLinesContainer" class="space-y-3"></div>
+                </div>
+                 <div class="input-group mt-6">
+                    <label for="dongpanSalesCheckKt" class="input-label flex items-center cursor-pointer">
+                        <input type="checkbox" id="dongpanSalesCheckKt" class="radio-input h-5 w-5 mr-2">
+                        KT 동판유심 판매 시 추가 사은품 적용 및 안내 보기
+                    </label>
+                    <div id="dongpanPolicyDetailsContainerKt" class="mt-3 hidden info-box">
+                        <h4 class="font-semibold text-sm mb-2">KT 인터넷 유심 개통 절차 안내 (상담원 참고용)</h4>
+                        <p class="text-xs mb-1"><strong>신청 및 인증:</strong></p>
+                        <ul class="list-disc list-inside text-xs space-y-0.5 mb-2">
+                            <li>KT 인터넷 유심 개통 신청서 링크: <a href="http://online.kt.com/index.jsp?prdcID=6C463388-3BDF-4E68-BE73-975E05BDA182" target="_blank" class="text-blue-700 font-bold hover:text-blue-800 underline text-lg">바로가기</a> (PASS 또는 신용카드 인증 필요)</li>
+                            <li>KT 동판 결합 본인인증 링크 (결합만 체크): <a href="https://online.kt.com/smart/simple/simpleCustomerInfoPop.do?prdcId=65278B4C-20F1-47FA-9EEF-56E9B574D346" target="_blank" class="text-blue-600 hover:underline font-semibold">바로가기</a></li>
+                        </ul>
+                        <p class="text-xs mb-1"><strong>결합 가능 회선:</strong> 인터넷 + 유심 동판 + 가족 유심 2회선 (총 3회선까지 가능)</p>
+                        <p class="text-xs mb-1"><strong>접수 과정:</strong> 백메가 접수웹(speedonline.kr) KT(일반) > 모바일 탭으로 접수</p>
+                        <p class="text-xs mb-1"><strong>접수 시 필수 기재 사항 (기타메모 양식):</strong></p>
+                        <ul class="list-disc list-inside text-xs space-y-0.5 mb-2">
+                            <li>인터넷 개통 완료 시: "[개통 완료 / 유심 발송 요청]"</li>
+                            <li>이미 개통된 고객 30일 이내 동판 시: "[개통완료 일자, 개통번호 기재 / 유심 발송 요청]"</li>
+                            <li>고객 유심 수령 후 개통 요청 시: "[고객 유심 수령 완료 / 개통 진행 요청]"</li>
+                        </ul>
+                        <p class="text-xs mb-1"><strong>개통 진행 및 유의사항:</strong></p>
+                        <ul class="list-disc list-inside text-xs space-y-0.5 mb-2">
+                            <li>고객에게 위약금 확인 및 동의 문자 발송 후 처리. 미동의 시 10분 후 강제 동의 처리 가능.</li>
+                            <li>USIM 교체 및 전원 ON 성공 후 선택약정 및 유무선 결합 필수 (완료 시 개통 완료 처리).</li>
+                            <li>유심 개통 최대 4시간 소요 가능. 사전 동의 문자 처리 시 빠른 개통.</li>
+                            <li>KT USIM 개통 전까지 기존 USIM 사용, 신호 끊기면 교체. 기기 수회 재시동 필요.</li>
+                        </ul>
+                        <p class="text-xs mb-1"><strong>비용 및 수수료 주의사항:</strong></p>
+                        <ul class="list-disc list-inside text-xs space-y-0.5">
+                            <li>유심 당일 발송 마감 15시.</li>
+                            <li>유심 비용 7,700원 / 번호이동 수수료 800원 첫 달 청구.</li>
+                            <li>인터넷/유심 중 하나라도 설치/개통 불가 시 수수료 지급 불가.</li>
+                            <li>인터넷 개통월 기준 익월 말까지 유심 개통 시 수수료 인정.</li>
+                            <li>선택약정 미적용 시 수수료 지급 불가.</li>
+                            <li>인터넷/유심 명의자 상이해도 유심 수수료 지급 가능.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="totalAmountDetailsContainer" class="mt-3 hidden discount-details">
+                    <p class="font-semibold mb-1">총액결합 상세 (상담원 참고용):</p>
+                    <p>인터넷 할인: <span id="detailInternetDiscount" class="font-bold">0</span>원</p>
+                    <p>휴대폰 할인 (참고용): <span id="detailMobileDiscount" class="font-bold">0</span>원</p>
+                    <p>총 할인 금액 (참고용): <span id="detailTotalDiscount" class="font-bold">0</span>원</p>
+                    <hr class="my-2 border-sky-300">
+                    <p class="text-xs mt-2 mb-1 text-sky-700 font-semibold">주요 참고사항:</p>
+                    <ul class="list-disc list-inside text-xs space-y-0.5">
+                        <li>할인 기준: 부가서비스, 단말기 할부금, 기타 할인 등을 제외한 순수 요금제의 총액 기준.</li>
+                        <li>혜택 구조: 인터넷+모바일 결합 시, 결합 회선이 많을수록 할인 혜택 증가.</li>
+                        <li>모바일 할인 방식: 대표 1회선에 전액 적용 또는 기여도에 따른 분할 중 선택.</li>
+                        <li>명의자 조건:
+                            <ul class="list-disc list-inside ml-4">
+                                <li>동일 명의자 모바일 최대 2회선까지 결합 가능.</li>
+                                <li>인터넷과 휴대폰 명의자가 달라도 결합 가능 (대표자 기준 직계가족 범위 내).</li>
+                            </ul>
+                        </li>
+                        <li>결합 회선 수: 최대 인터넷 1회선 + 휴대폰 5회선.</li>
+                        <li>중복 가입 불가: 기존 무선간 휴대폰 결합 상품과 중복 불가.</li>
+                    </ul>
+                </div>
+                <div id="premiumFamilyDetailsContainer" class="mt-3 hidden discount-details">
+                    <p class="font-semibold mb-1">프리미엄 가족결합 상세 (상담원 참고용):</p>
+                    <p>인터넷 할인: <span id="detailPfInternetDiscount" class="font-bold">0</span>원</p>
+                    <div id="detailPfMobileDiscountsContainer" class="mt-2">
+                        <p>모바일 할인 (참고용): 조건 확인 중...</p>
+                    </div>
+                    <hr class="my-2 border-sky-300">
+                    <p class="text-xs mt-2 mb-1 text-sky-700 font-semibold">주요 참고사항:</p>
+                    <ul class="list-disc list-inside text-xs space-y-0.5">
+                        <li>조건: 인터넷 500M 이상 + 월 77,000원 이상 모바일 1회선 이상 (베이스) + 추가 고가 모바일 회선(선택).</li>
+                        <li>베이스 회선: 기본 5,500원 할인 + 선택약정 25% 중복 가능.</li>
+                        <li>추가 고가 회선 (2번째, 7.7만원 이상&체크 시): 프리미엄 가족결합 25% + 선택약정 25% 중복 가능.</li>
+                        <li>회선 3~7 (베이스 및 2번째 회선 고가 조건 충족 시):
+                            <ul class="list-disc list-inside ml-4">
+                                <li>7.7만원 이상 & 체크 시: 2번째 회선과 동일 할인.</li>
+                                <li>7.7만원 미만: 나머지 하위 요금제 합산 후, 총액결합할인표(JSON)의 모바일 할인액 적용.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <div id="premiumSingleDetailsContainer" class="mt-3 hidden discount-details">
+                    <p class="font-semibold mb-1">프리미엄 싱글결합 상세 (상담원 참고용):</p>
+                    <p>인터넷 할인: <span id="detailPsInternetDiscount" class="font-bold">0</span>원</p>
+                    <p>모바일 할인: <span id="detailPsMobileDiscountText" class="font-bold">조건 미충족</span></p>
+                    <p>모바일 최종 청구 금액: <span id="detailPsMobileFinalAmount" class="font-bold">0</span>원</p>
+                    <hr class="my-2 border-sky-300">
+                    <p class="text-xs mt-2 mb-1 text-sky-700 font-semibold">주요 참고사항:</p>
+                    <ul class="list-disc list-inside text-xs space-y-0.5">
+                        <li>조건: 인터넷 500M 이상 + 휴대폰 월정액 77,000원 이상 1회선.</li>
+                        <li>인터넷 단독 시: 인터넷 5,500원 할인.</li>
+                        <li>인터넷+TV/집전화 번들 시: 인터넷 할인 없음 (모바일 25% 할인만 적용. 계산기에는 인터넷 할인만 표시).</li>
+                        <li>모바일 25% 할인: 선택약정 중복 가능.</li>
+                    </ul>
+                </div>
+                <div id="familyBundleDetailsContainer" class="mt-3 hidden discount-details">
+                    <p class="font-semibold mb-1">패밀리 결합 (인터넷 추가회선) 상세 (상담원 참고용):</p>
+                    <p>인터넷 할인 (자회선): <span id="detailFbInternetDiscount" class="font-bold">0</span>원</p>
+                    <hr class="my-2 border-sky-300">
+                     <p class="text-xs mt-2 mb-1 text-sky-700 font-semibold">주요 참고사항:</p>
+                    <ul class="list-disc list-inside text-xs space-y-0.5">
+                        <li>조건: 기존 KT 인터넷(모회선) 사용 가족이 신규 장소에 추가 인터넷(자회선) 설치 시.</li>
+                        <li>100M 자회선: 5,500원 할인.</li>
+                        <li>500M 이상 자회선: 11,000원 할인.</li>
+                        <li>개통 후 1개월 내 결합.</li>
+                    </ul>
+                </div>
+                 <div id="separateFamilyDetailsContainer" class="mt-3 hidden discount-details">
+                    <p class="font-semibold mb-1">따로 살아도 가족결합 상세 (상담원 참고용):</p>
+                    <p>인터넷 할인 (추가 회선): <span id="detailSfInternetDiscount" class="font-bold">0</span>원</p>
+                    <p>TV 할인 (참고용, 추가 회선): <span id="detailSfTvDiscount" class="font-bold">0</span>원</p>
+                    <p>모바일 추가 할인 (참고용): 가능성 있음 (총액결합 기반)</p>
+                    <hr class="my-2 border-sky-300">
+                     <p class="text-xs mt-2 mb-1 text-sky-700 font-semibold">주요 참고사항:</p>
+                    <ul class="list-disc list-inside text-xs space-y-0.5">
+                        <li>방식: 모회선이 총액 결합 중일 때, 추가 인터넷 회선에 적용 (총액 결합에 추가).</li>
+                        <li>100M 인터넷: 인터넷/TV 할인 없음.</li>
+                        <li>500M 인터넷: 인터넷 2,200원 할인, TV 2,200원 할인 (TV 할인은 참고용).</li>
+                        <li>1G 인터넷: 인터넷 3,300원 할인, TV 3,300원 할인 (TV 할인은 참고용).</li>
+                        <li>조건: 베이스 회선(모회선) 인1+모1 지정 필수. 베이스 회선 제외 인터넷 최대 5개까지 결합 가능.</li>
+                        <li>가입 대상: 25년 3월 이후 인터넷 신규 가입자 (기존 가입자는 약정 종료 후 재약정 시).</li>
+                        <li>중복 불가: 패밀리 자회선은 중복 적용 불가.</li>
+                        <li>신청: 선결 또는 개통 후 익월 말까지 가능. 서류 필요.</li>
+                    </ul>
+                </div>
+                <div id="mvnoDetailsContainer" class="mt-3 hidden discount-details">
+                    <p class="font-semibold mb-1">알뜰폰 결합 상세 (상담원 참고용):</p>
+                    <p>적용 인터넷 할인: <span id="detailMvnoInternetDiscount" class="font-bold">0</span>원</p>
+                    <hr class="my-2 border-sky-300">
+                    <p class="text-xs mt-2 mb-1 text-sky-700 font-semibold">주요 참고사항:</p>
+                    <ul class="list-disc list-inside text-xs space-y-0.5">
+                        <li>100Mbps 인터넷 (단독/번들): 3,300원 할인.</li>
+                        <li>500Mbps~1Gbps 인터넷 (단독): 11,000원 할인.</li>
+                        <li>500Mbps~1Gbps 인터넷 (번들): 5,500원 할인.</li>
+                        <li>개인사업자 / 법인사업자 결합 불가.</li>
+                        <li>결합 가능 알뜰폰 통신사: KT M모바일, 미니게이트(쉐이크모바일), 유니컴즈(모빙), 토스모바일, 국민은행(리브모바일), 더피엔엘(퍼스트모바일), 에르엘(오파스넷모바일), 고고팩토리, 스마텔, 스카이라이프, 코드모바일, 프리티, 니오라코리아, 스피츠모바일, 아이즈비전 등.</li>
+                        <li>인터넷 설치 후 알뜰 통신사에 결합 요청 필요.</li>
+                        <li>알뜰폰 통신사 변경 시 결합 해지 후 재결합 불가.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <section id="displayModeSectionKt" class="mb-8">
+            <h2 class="section-title">결제금액 표시 방식 선택</h2>
+            <div class="bg-white p-6 rounded-lg shadow">
+                <label class="radio-label">
+                    <input type="radio" name="displayModeKt" value="preApplied" class="radio-input" checked>
+                    선결합 기준 (할인이 적용된 최종 월 납부액)
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="displayModeKt" value="postApplied" class="radio-input">
+                    후결합 기준 (할인이 적용되기 전 총 서비스 월 기본료)
+                </label>
+            </div>
+        </section>
+
+        <section id="installationSection" class="mb-8">
+            <h2 class="section-title">3. 설치 옵션</h2>
+            <div class="input-group bg-white p-6 rounded-lg shadow">
+                <label class="input-label">설치 희망 시점 (설치비 변동)</label>
+                <div class="space-y-2">
+                    <label class="radio-label"><input type="radio" name="installationTime" value="weekday" class="radio-input" checked> 평일 주간</label>
+                    <label class="radio-label"><input type="radio" name="installationTime" value="weekend" class="radio-input"> 주말/야간 (할증 적용)</label>
+                </div>
+            </div>
+        </section>
+
+        <div class="text-center mb-8 flex justify-center items-center">
+            <button id="calculateButton" class="btn-primary text-lg">예상 요금 계산하기</button>
+            <button id="resetButton" class="btn-secondary text-lg ml-4">초기화</button>
+        </div>
+
+        <section id="resultSection" class="hidden">
+            <h2 class="section-title">📊 계산 결과</h2>
+            
+            <div class="result-card">
+                <h3 class="text-xl font-semibold text-sky-600 mb-3">요금 요약 (VAT 포함)</h3>
+                <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <p class="result-label summary-item">선택 인터넷: <span id="selectedInternet" class="result-value"></span></p>
+                        <p class="result-label summary-item">선택 TV (1번째): <span id="selectedTv" class="result-value"></span></p>
+                        <p class="result-label summary-item">선택 셋톱박스 (1번째 TV): <span id="selectedStb" class="result-value"></span></p>
+                        <p class="result-label summary-item">선택 추가 TV (2번째): <span id="selectedAdditionalTv" class="result-value"></span></p>
+                        <p class="result-label summary-item">선택 집전화: <span id="selectedPhone" class="result-value"></span></p>
+                        <p class="result-label summary-item">모바일 회선 수: <span id="selectedMobileCount" class="result-value"></span></p>
+                        <p class="result-label summary-item">적용 할인 유형: <span id="selectedDiscountType" class="result-value"></span></p>
+                    </div>
+                    <div>
+                        <p class="result-label summary-item">월 인터넷 기본료: <span id="totalBaseInternetCost" class="result-value">0</span> 원</p>
+                        <p class="result-label text-green-600 summary-item">월 인터넷 결합 할인액: <span id="totalInternetDiscountAmount" class="result-value text-green-600">0</span> 원</p>
+                        <p class="result-label summary-item">월 모뎀 임대료: <span id="internetModemRental" class="result-value">0</span> 원</p>
+                        <p class="result-label summary-item">월 와이파이 공유기 임대료: <span id="wifiRouterRentalCostDisplay" class="result-value">0</span> 원</p>
+                        
+                        <div id="tvCostSummaryContainer" class="hidden"> 
+                             <hr class="my-1 border-slate-200">
+                            <p class="result-label summary-item">월 TV 기본료 (1번째): <span id="tvBaseCostDisplay" class="result-value">0</span> 원</p>
+                            <p class="result-label text-green-600 summary-item">월 TV 결합 할인액 (1번째): <span id="tvDiscountDisplay" class="result-value text-green-600">0</span> 원</p>
+                            <p class="result-label summary-item">월 TV 셋톱박스 임대료 (1번째): <span id="stbRentalCostDisplay" class="result-value">0</span> 원</p>
+                        </div>
+                         <div id="additionalTvCostSummaryContainer" class="hidden">
+                             <hr class="my-1 border-slate-200">
+                            <p class="result-label summary-item">월 추가 TV 요금 (2번째, 셋톱포함): <span id="additionalTvCostDisplay" class="result-value">0</span> 원</p>
+                        </div>
+                        <div id="phoneCostSummaryContainer" class="hidden">
+                             <hr class="my-1 border-slate-200">
+                            <p class="result-label summary-item">월 집전화 기본료: <span id="phoneBaseCostDisplay" class="result-value">0</span> 원</p>
+                            <p class="result-label text-green-600 summary-item">월 집전화 결합 할인액: <span id="phoneDiscountDisplay" class="result-value text-green-600">0</span> 원</p>
+                        </div>
+                        <div id="addonServicesSummaryContainer" class="hidden">
+                            <hr class="my-1 border-slate-200">
+                            <p class="result-label summary-item">월 부가서비스 총액: <span id="addonServicesTotalCostDisplay" class="result-value">0</span> 원</p>
+                        </div>
+                        <hr class="my-1 border-sky-300">
+                        <p class="mt-2 text-lg font-semibold"><span id="finalCostLabel">최종 예상 월 납부액</span>: <span id="finalMonthlyCost" class="total-value">0</span> 원</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="result-card">
+                <h3 class="text-xl font-semibold text-sky-600 mb-3">🎁 사은품 혜택 (예상)</h3>
+                <p class="result-label summary-item">현금 사은품 (기본): <span id="giftCash" class="result-value">0</span> 원</p>
+                <p class="result-label summary-item">상품권 사은품 (기본): <span id="giftVoucher" class="result-value">0</span> 원</p>
+                <p class="result-label summary-item">일반전화 추가 상품권: <span id="giftPhoneVoucher" class="result-value">0</span> 원</p>
+                <p class="result-label summary-item">추가 TV 사은품 (현금): <span id="giftAdditionalTv" class="result-value">0</span> 원</p>
+                <p class="result-label summary-item hidden" id="dongpanCashContainerKt">동판 추가 현금 사은품 (KT): <span id="giftDongpanAdditionalCashKt" class="result-value">0</span> 원</p>
+                <hr class="my-1">
+                <p class="result-label summary-item font-semibold">총 사은품 가치: <span id="giftTotal" class="result-value text-green-600">0</span> 원</p>
+                <p class="text-xs text-slate-500 mt-2">✅ KT 일반전화 상품권 지류 2만원 추가 / 추가셋톱 3만원 (참고)</p>
+                <p class="text-xs text-slate-500 mt-1">✅ KT 롯데 / LG 신세계 모바일 상품권은 현금 교환 가능 (참고)</p>
+                <p class="text-xs text-red-500 mt-1">* 사은품 정보는 변동될 수 있으니 가입 시점에 반드시 재확인 바랍니다.</p>
+            </div>
+
+            <div class="result-card">
+                <h3 class="text-xl font-semibold text-sky-600 mb-3">초기 설치 비용 (선택한 모든 유선 서비스 기준)</h3>
+                <p class="result-label">예상 총 설치비: <span id="installationCostResult" class="result-value text-lg">0</span> 원</p>
+                <p class="text-xs text-slate-500 mt-1">* 선택하신 설치 시점(평일/주말) 및 서비스 조합에 따라 계산됩니다. 프로모션으로 면제될 수 있습니다.</p>
+            </div>
+            
+             <div class="result-card mt-6">
+                <h3 class="text-xl font-semibold text-sky-600 mb-2">추가 안내사항</h3>
+                <ul class="list-disc list-inside text-sm text-slate-600 space-y-1">
+                    <li>본 계산기는 제공된 KT 결합상품 정보를 바탕으로 한 추정치입니다.</li>
+                    <li>**"인터넷+인터넷 패밀리 결합"** 및 **"따로 살아도 가족결합"**은 현재 계산기에서 '추가 회선(자회선)' 기준으로 할인액을 보여줍니다. 모회선 조건 및 기타 복잡한 다회선 할인은 현재 계산기 구조상 모두 반영되지 않았습니다. 이러한 유형의 할인은 별도 문의가 필요합니다.</li>
+                    <li>실제 요금은 KT의 최신 정책, 가입 시점의 프로모션, 추가 선택 사항에 따라 달라질 수 있습니다.</li>
+                    <li>약정 기간 내 해지 시 위약금이 발생할 수 있습니다.</li>
+                    <li>더 정확한 정보는 KT 공식 홈페이지 또는 고객센터(국번없이 100)를 통해 확인하시기 바랍니다.</li>
+                </ul>
+            </div>
+        </section>
+        
+        <section id="messageScriptSection" class="hidden mt-12">
+            <h2 class="section-title">📄 고객 안내 문자 스크립트 (상담원 참고용)</h2>
+            <div class="result-card">
+                <h3 class="text-xl font-semibold text-sky-600 mb-3">1. 백메가 전산 메모</h3>
+                <textarea id="memoScript" class="message-script-area" readonly></textarea>
+                <div class="copy-button-container">
+                    <button onclick="copyToClipboard('memoScript', 'copyFeedbackMemo')" class="btn-secondary text-xs">복사하기</button>
+                    <span id="copyFeedbackMemo" class="copy-feedback"></span>
+                </div>
+            </div>
+            <div class="result-card">
+                <h3 class="text-xl font-semibold text-sky-600 mb-3">2. 상품 안내 문자</h3>
+                <textarea id="infoScript" class="message-script-area" readonly></textarea>
+                 <div class="copy-button-container">
+                    <button onclick="copyToClipboard('infoScript', 'copyFeedbackInfo')" class="btn-secondary text-xs">복사하기</button>
+                    <span id="copyFeedbackInfo" class="copy-feedback"></span>
+                </div>
+            </div>
+            <div class="result-card">
+                <h3 class="text-xl font-semibold text-sky-600 mb-3">3. 가입 완료 문자</h3>
+                <textarea id="completeScript" class="message-script-area" readonly></textarea>
+                 <div class="copy-button-container">
+                    <button onclick="copyToClipboard('completeScript', 'copyFeedbackComplete')" class="btn-secondary text-xs">복사하기</button>
+                    <span id="copyFeedbackComplete" class="copy-feedback"></span>
+                </div>
+            </div>
+             <div class="result-card">
+                <h3 class="text-xl font-semibold text-sky-600 mb-3">4. 백메가 유심동판 메모 (상담원용)</h3>
+                <textarea id="dongpanMemoScript" class="message-script-area" readonly></textarea>
+                <div class="copy-button-container">
+                    <button onclick="copyToClipboard('dongpanMemoScript', 'copyFeedbackDongpanMemo')" class="btn-secondary text-xs">복사하기</button>
+                    <span id="copyFeedbackDongpanMemo" class="copy-feedback"></span>
+                </div>
+            </div>
+            <div class="result-card">
+                <h3 class="text-xl font-semibold text-sky-600 mb-3">5. 민감정보 전송용 링크 (고객 발송용)</h3>
+                <textarea id="sensitiveInfoLinkScript" class="message-script-area" readonly></textarea>
+                <div class="copy-button-container">
+                    <button onclick="copyToClipboard('sensitiveInfoLinkScript', 'copyFeedbackSensitiveInfo')" class="btn-secondary text-xs">복사하기</button>
+                    <span id="copyFeedbackSensitiveInfo" class="copy-feedback"></span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="text-center p-6 mt-12 bg-sky-800 text-sky-200 text-sm">
+        <p>본 계산기는 KT 미소에서 제공합니다.</p>
+        <p>&copy; 2024 KT 결합 할인 계산기. 모든 정보는 참고용입니다.</p>
+    </footer>
+
     <script src="script.js"></script>
 </body>
 </html>
